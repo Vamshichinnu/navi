@@ -1,0 +1,33 @@
+- hosts: primary
+  tasks:
+    - name: Install PostgreSQL
+      apt:
+        name: "postgresql-{{ pg_version }}"
+        update_cache: yes
+
+    - name: Configure postgresql.conf
+      lineinfile:
+        path: /etc/postgresql/{{ pg_version }}/main/postgresql.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - {
+            regexp: "^#?max_connections",
+            line: "max_connections = {{ max_connections }}",
+          }
+        - {
+            regexp: "^#?shared_buffers",
+            line: "shared_buffers = {{ shared_buffers }}",
+          }
+
+    - name: Configure replication settings
+      lineinfile:
+        path: /etc/postgresql/{{ pg_version }}/main/postgresql.conf
+        line: "wal_level = replica"
+
+    - name: Create replication user
+      become_user: postgres
+      postgresql_user:
+        name: "replica_user"
+        password: "replica_password"
+        priv: "REPLICATION"
