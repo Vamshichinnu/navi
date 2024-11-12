@@ -29,7 +29,7 @@ resource "aws_instance" "primary" {
 
 resource "aws_instance" "replica" {
   count         = var.num_replicas
-  ami           = "ami-0c55b159cbfafe1f0"
+  ami           = "ami-08bf489a05e916bbd"
   instance_type = var.instance_type
   security_groups = [aws_security_group.pg_sg.name]
   tags = {
